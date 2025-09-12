@@ -52,12 +52,10 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
     },
     phone: {
       type: Number,
-      required: true,
       unique: true,
       match: /^[0-9]{10}$/, // 10-digit phone number
     },
