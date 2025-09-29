@@ -8,7 +8,7 @@ require('dotenv').config();
 router.get('/google', 
     passport.authenticate("google", {
     scope: ['profile', 'email'],
-  }), 
+  }) 
     
 );
 
