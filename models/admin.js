@@ -1,60 +1,47 @@
-// models/adminModel.js
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-// Admin schema with validation
-const adminSchema = new mongoose.Schema(
+// Admin Schema with Mongoose Validation
+const adminSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       minlength: 3,
       maxlength: 50,
-      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      trim: true,
-      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // email regex
+      match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
     },
     password: {
       type: String,
       required: true,
-      minlength: 6,
-    },
-    phone: {
-      type: Number,
-      required: true,
-      unique: true,
-      match: /^[0-9]{10}$/, // 10-digit phone number
     },
     role: {
       type: String,
-      enum: ["admin", "superadmin"], // example roles
-      default: "admin",
+      required: true,
+      enum: ["admin", "superadmin"], // Assuming there are two roles
     },
   },
   { timestamps: true }
 );
 
-// Joi validation
-function validateAdmin(admin) {
+// Joi Validation Schema
+const validateAdmin = (data) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    phone: Joi.string()
-      .pattern(/^[0-9]{10}$/)
-      .required(),
-    role: Joi.string().valid("superadmin", "admin").optional(),
+    role: Joi.string().valid("admin", "superadmin").required(),
   });
 
-  return schema.validate(admin);
-}
+  return schema.validate(data);
+};
 
-const adminModel = mongoose.model("adminModel", adminSchema);
-
-module.exports = { adminModel, validateAdmin };
+module.exports = {
+  adminModel: mongoose.model("admin", adminSchema),
+  validateAdmin,
+};

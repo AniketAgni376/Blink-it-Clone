@@ -1,14 +1,13 @@
-// models/productModel.js
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-const productSchema = new mongoose.Schema(
+// Product Schema with Mongoose Validation
+const productSchema = mongoose.Schema(
   {
-    state: {
+    name: {
       type: String,
       required: true,
-      trim: true,
-      minlength: 2,
+      minlength: 3,
       maxlength: 100,
     },
     price: {
@@ -19,36 +18,38 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      trim: true,
+      minlength: 3,
+      maxlength: 50,
     },
     stock: {
-      type: Boolean,
-      default: true,
+      type: Number,
+      required: true,
     },
     description: {
       type: String,
     },
     image: {
-      type: String,
+      type: Buffer,
     },
   },
   { timestamps: true }
 );
 
-// Joi validation function
-function validateProduct(product) {
+// Joi Validation Schema
+const validateProduct = (data) => {
   const schema = Joi.object({
-    state: Joi.string().min(2).max(100).required(),
+    name: Joi.string().min(3).max(100).required(),
     price: Joi.number().min(0).required(),
-    category: Joi.string().required(),
-    stock: Joi.boolean().optional(),
-    description: Joi.string().required(),
-    image: Joi.string().required(),
+    category: Joi.string().min(3).max(50).required(),
+    stock: Joi.number().required(),
+    description: Joi.string().optional(),
+    image: Joi.string().optional(),
   });
 
-  return schema.validate(product);
-}
+  return schema.validate(data);
+};
 
-const productModel = mongoose.model("Product", productSchema);
-
-module.exports = { productModel, validateProduct };
+module.exports = {
+  productModel: mongoose.model("product", productSchema),
+  validateProduct,
+};

@@ -1,54 +1,46 @@
-// models/userModel.js
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-// Address sub-schema with validation
-const AddressSchema = new mongoose.Schema({
+const AdressSchema = mongoose.Schema({
   state: {
     type: String,
     required: true,
-    trim: true,
     minlength: 2,
+    maxlength: 50,
   },
-  zipcode: {
+  zip: {
     type: Number,
     required: true,
-    min: 10000, // assuming Indian PIN format
-    max: 999999,
+    min: 10000,
+    max: 999999, // Assuming 5-digit ZIP codes
   },
   city: {
     type: String,
     required: true,
-    trim: true,
     minlength: 2,
     maxlength: 50,
   },
   address: {
     type: String,
     required: true,
-    trim: true,
     minlength: 5,
     maxlength: 255,
   },
 });
 
-// Main user schema
-const userSchema = new mongoose.Schema(
+const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       minlength: 3,
       maxlength: 50,
-      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      trim: true,
-      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // basic email regex
+      match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
     },
     password: {
       type: String,
@@ -56,39 +48,40 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: Number,
-      unique: true,
-      match: /^[0-9]{10}$/, // 10-digit phone number
+      match: /^[0-9]{10}$/, // Assuming 10-digit phone numbers
     },
     addresses: {
-      type: [AddressSchema],
-      validate: (v) => Array.isArray(v) && v.length > 0,
+      type: [AdressSchema],
     },
   },
   { timestamps: true }
 );
 
-// JOI validation function
-function validateUser(user) {
-  const addressSchema = Joi.object({
-    state: Joi.string().min(2).required(),
-    zipcode: Joi.number().integer().min(100000).max(999999).required(),
-    city: Joi.string().required(),
-    address: Joi.string().min(5).required(),
-  });
-
+const validateUser = (data) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
     phone: Joi.string()
-      .pattern(/^[0-9]{10}$/)
+      .length(10)
+      .pattern(/^[0-9]+$/)
       .required(),
-    addresses: Joi.array().items(addressSchema).min(1).required(),
+    addresses: Joi.array()
+      .items(
+        Joi.object({
+          state: Joi.string().min(2).max(50).required(),
+          zip: Joi.number().min(10000).max(99999).required(),
+          city: Joi.string().min(2).max(50).required(),
+          address: Joi.string().min(5).max(255).required(),
+        })
+      )
+      .max(5), // Maximum 5 addresses
   });
 
-  return schema.validate(user);
-}
+  return schema.validate(data);
+};
 
-const userModel = mongoose.model("user", userSchema);
-
-module.exports = { userModel, validateUser };
+module.exports = {
+  userModel: mongoose.model("user", userSchema),
+  validateUser,
+};

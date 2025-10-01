@@ -1,28 +1,29 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-const categorySchema = new mongoose.Schema(
+const categorySchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      unique: true,
-      minlength: 2,
+      minlength: 3,
       maxlength: 50,
+      unique: true, // Ensure category names are unique
     },
   },
   { timestamps: true }
 );
 
-// Joi validation function
-function validateCategory(category) {
+// Joi Validation Schema
+const validateCategory = (data) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(50).required(),
   });
 
-  return schema.validate(category);
-}
+  return schema.validate(data);
+};
 
-const categoryModel = mongoose.model("categoryModel", categorySchema);
-
-module.exports = { categoryModel, validateCategory };
+module.exports = {
+  categoryModel: mongoose.model("category", categorySchema),
+  validateCategory,
+};

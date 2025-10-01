@@ -1,18 +1,18 @@
-// models/cartModel.js
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-const cartSchema = new mongoose.Schema(
+// Cart Schema with Mongoose Validation
+const cartSchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // should match your user model
+      ref: "user",
       required: true,
     },
     products: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product", // should match your product model
+        ref: "product",
         required: true,
       },
     ],
@@ -25,20 +25,18 @@ const cartSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Joi validation function
-function validateCart(cart) {
+// Joi Validation Schema
+const validateCart = (data) => {
   const schema = Joi.object({
-    user: Joi.string().hex().length(24).required(), // ObjectId validation
-    products: Joi.array()
-      .items(Joi.string().hex().length(24).required())
-      .min(1)
-      .required(),
+    user: Joi.string().required(),
+    products: Joi.array().items(Joi.string().required()).required(),
     totalPrice: Joi.number().min(0).required(),
   });
 
-  return schema.validate(cart);
-}
+  return schema.validate(data);
+};
 
-const cartModel = mongoose.model("cartModel", cartSchema);
-
-module.exports = { cartModel, validateCart };
+module.exports = {
+  cartModel: mongoose.model("cart", cartSchema),
+  validateCart,
+};

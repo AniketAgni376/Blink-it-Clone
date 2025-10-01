@@ -1,18 +1,22 @@
-// models/orderModel.js
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
-const orderSchema = new mongoose.Schema(
+// Order Schema with Mongoose Validation
+const orderSchema = mongoose.Schema(
   {
+    orderId: {
+      type: String,
+      required: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
     },
     products: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "product",
         required: true,
       },
     ],
@@ -23,49 +27,45 @@ const orderSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
-      trim: true,
       minlength: 5,
+      maxlength: 255,
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
-      default: "pending",
+      required: true,
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
     },
     payment: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Payment",
+      ref: "payment",
       required: true,
     },
     delivery: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Delivery",
-      required: false,
+      ref: "delivery",
     },
   },
   { timestamps: true }
 );
 
-// Joi validation function
-function validateOrder(order) {
+// Joi Validation Schema
+const validateOrder = (data) => {
   const schema = Joi.object({
-    user: Joi.string().hex().length(24).required(), // ObjectId
-    products: Joi.array()
-      .items(Joi.string().hex().length(24).required())
-      .min(1)
-      .required(),
+    user: Joi.string().required(),
+    products: Joi.array().items(Joi.string().required()).required(),
     totalPrice: Joi.number().min(0).required(),
-    address: Joi.string().min(5).required(),
+    address: Joi.string().min(5).max(255).required(),
     status: Joi.string()
-      .valid("pending", "confirmed", "shipped", "delivered", "cancelled")
-      .optional(),
-    payment: Joi.string().hex().length(24).required(),
-    delivery: Joi.string().hex().length(24).optional(),
+      .valid("pending", "processing", "shipped", "delivered", "cancelled")
+      .required(),
+    payment: Joi.string().required(),
+    delivery: Joi.string().optional(),
   });
 
-  return schema.validate(order);
-}
+  return schema.validate(data);
+};
 
-const orderModel = mongoose.model("Order", orderSchema);
-
-module.exports = { orderModel, validateOrder };
+module.exports = {
+  orderModel: mongoose.model("order", orderSchema),
+  validateOrder,
+};
