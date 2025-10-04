@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
+const adminRouter = require("./routes/admin");
 const path = require("path");
 const session = require('express-session');
 
@@ -10,6 +11,12 @@ const session = require('express-session');
 require('dotenv').config();
 require('./config/db');
 require('./config/google_auth_config');
+
+if (
+  typeof process.env.NODE_ENV !== "undefined" && 
+  process.env.NODE_ENV === "DEVELOPMENT") {
+    console.log("in Development mode");
+  }
 
 
 app.set('view engine', 'ejs');
@@ -24,9 +31,13 @@ app.use(session({
   saveUninitialized: true,
 }));
 
+
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
+app.use('/admin', adminRouter);
 
 app.listen(3000);
