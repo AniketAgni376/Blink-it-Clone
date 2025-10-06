@@ -4,6 +4,7 @@ const app = express();
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
 const adminRouter = require("./routes/admin");
+const productRouter = require("./routes/product");
 const path = require("path");
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -40,5 +41,6 @@ app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
+app.use('/products', productRouter);
 
 app.listen(3000);
