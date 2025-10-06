@@ -6,6 +6,7 @@ const authRouter = require("./routes/auth");
 const adminRouter = require("./routes/admin");
 const path = require("path");
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
 
 require('dotenv').config();
@@ -31,7 +32,7 @@ app.use(session({
   saveUninitialized: true,
 }));
 
-
+app.use(cookieParser());
 
 
 app.use(passport.initialize());
