@@ -5,8 +5,14 @@ const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
 const adminRouter = require("./routes/admin");
 const productRouter = require("./routes/product");
-const categoryRouter = require("./routes/category");
+const categoriesRouter = require("./routes/category");
+const orderRouter = require("./routes/order");
+const paymentRouter = require("./routes/payment");
+
+
+
 const userRouter = require("./routes/user");
+const cartRouter = require("./routes/cart");
 const path = require("path");
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -36,16 +42,21 @@ app.use(session({
 }));
 
 app.use(cookieParser());
-
-
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/', indexRouter);
-app.use('/auth', authRouter);
-app.use('/admin', adminRouter);
-app.use('/products', productRouter);
-app.use('/category', categoryRouter);
-app.use('/user', userRouter);
+
+app.use("/", indexRouter);
+app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
+app.use("/products", productRouter);
+app.use("/categories", categoriesRouter);
+app.use("/users", userRouter);
+app.use("/cart", cartRouter);
+app.use("/payment", paymentRouter);
+app.use("/order", orderRouter);
+
+
+
 
 
 app.listen(3000);

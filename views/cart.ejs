@@ -19,6 +19,7 @@
                         <p class="text-xs text-gray-500">Shipment of 1 item</p>
                     </div>
                 </div>
+                <div id="cart-items">
                 <% cart.forEach(elem=> { %>
                     <div class="flex items-center mt-4">
                         <img src="data:image/jpg;base64, <%= elem.image.toString('base64') %>" alt="<%= elem.name %>"
@@ -31,54 +32,43 @@
                         </div>
                         <div class="ml-auto">
                             <div class="flex items-center justify-center bg-green-700 text-white rounded-md">
-                                <a href="/cart/remove/<%= elem._id %>" class="px-2 py-1 rounded"><i
-                                        class="ri-subtract-line"></i></a>
-                                <p class="mx-2">
+                                <button class="cart-decrement px-2 py-1 rounded" data-id="<%= elem._id %>"><i class="ri-subtract-line"></i></button>
+                                <p class="mx-2 quantity" data-id="<%= elem._id %>">
                                     <%= elem.quantity %>
                                 </p>
-                                <button class="px-2 py-1 rounded"><i class="ri-add-line"></i></button>
+                                <button class="cart-increment px-2 py-1 rounded" data-id="<%= elem._id %>"><i class="ri-add-line"></i></button>
                             </div>
                             <div class="flex gap-2 mt-4">
-                                <p class="text-gray-500 line-through">₹<%= Number(elem.price)*Number(elem.quantity)+20
+                                <p class="text-gray-500 line-through item-strike" data-id="<%= elem._id %>" data-price="<%= Number(elem.price) %>">₹<%= Number(elem.price)*Number(elem.quantity)+20
                                         %>
                                 </p>
-                                <p>₹<%= Number(elem.price)*Number(elem.quantity)%>
+                                <p class="item-total" data-id="<%= elem._id %>" data-price="<%= Number(elem.price) %>">₹<%= Number(elem.price)*Number(elem.quantity)%>
                                 </p>
                             </div>
                         </div>
                     </div>
                     <% })%>
+                </div>
             </div>
 
             <!-- Before You Checkout -->
             <div class="bg-white p-4 rounded-lg shadow mb-4">
                 <h2 class="text-lg font-semibold">Before you checkout</h2>
                 <div class="flex space-x-4 mt-4">
-                    <div class="flex flex-col items-center">
-                        <img src="https://www.bigbasket.com/media/uploads/p/xxl/40015993_11-uncle-chips-spicy-treat.jpg"
-                            alt="Product Image" class="h-24 rounded">
-                        <p class="text-sm text-center mt-2">Uncle Chipps Spicy Treat Flavour Potato Chips</p>
-                        <p class="text-xs text-gray-500">48 g</p>
-                        <button class="bg-green-700 text-white px-4 py-1 rounded mt-2">ADD</button>
-                        <p class="text-xs mt-2">₹20</p>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img src="https://m.media-amazon.com/images/I/61mQ-Q7HmCL._AC_UF1000,1000_QL80_.jpg"
-                            alt="Product Image" class="h-24 rounded">
-                        <p class="text-sm text-center mt-2">Coca-Cola Soft Drink (300 ml)</p>
-                        <p class="text-xs text-gray-500">300 ml</p>
-                        <button class="bg-green-700 text-white px-4 py-1 rounded mt-2">ADD</button>
-                        <p class="text-xs mt-2">₹40</p>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img src="https://www.dorita.se/media/catalog/product/9/0/900179-lay-s-saltet-potetgull-175g.jpg"
-                            alt="Product Image" class="h-24 rounded">
-                        <p class="text-sm text-center mt-2">Chheda's Golden Banana Chips (Rock Salt)</p>
-                        <p class="text-xs text-gray-500">170 g</p>
-                        <button class="bg-green-700 text-white px-4 py-1 rounded mt-2">ADD</button>
-                        <p class="text-xs mt-2">₹85</p>
-                        <p class="text-xs text-red-500">16% OFF</p>
-                    </div>
+                    <% if (suggestedProducts && suggestedProducts.length > 0) { %>
+                        <% suggestedProducts.forEach(function(product) { %>
+                            <div class="flex flex-col items-center">
+                                <img src="data:image/jpg;base64, <%= product.image ? product.image.toString('base64') : '' %>"
+                                    alt="<%= product.name %>" class="h-24 rounded">
+                                <p class="text-sm text-center mt-2"><%= product.name %></p>
+                                <button class="add-suggested-product bg-green-700 text-white px-4 py-1 rounded mt-2" data-id="<%= product._id %>">ADD</button>
+                                <p class="text-xs mt-2">₹<%= product.price %></p>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <!-- Fallback if no suggested products -->
+                        <p class="text-sm text-gray-500">No suggested products available</p>
+                    <% } %>
                 </div>
                 <div class="mt-4 text-center text-white bg-green-700 py-5 px-10 rounded-md">
                     <h1 class="text-xl font-semibold">Get FREE delivery</h1>
@@ -95,7 +85,7 @@
                 <div class="mt-2">
                     <div class="flex justify-between">
                         <p class="text-sm">Items total</p>
-                        <p class="text-sm">₹<%= finalprice - 34 %>
+                        <p id="items-total" class="text-sm">₹<%= finalprice - 34 %>
                         </p>
                     </div>
                     <div class="flex justify-between">
@@ -108,7 +98,7 @@
                     </div>
                     <div class="flex justify-between font-bold mt-2">
                         <p class="text-lg">Grand total</p>
-                        <p class="text-lg">₹<%= finalprice %>
+                        <p id="grand-total" class="text-lg">₹<%= finalprice %>
                         </p>
                     </div>
                 </div>
@@ -177,9 +167,9 @@
                         <p class="text-xs text-gray-500">Paytm UPI</p>
                     </div>
                     <div>
-                        <p class="text-lg font-bold">₹<%= finalprice %>
+                        <p id="footer-total" class="text-lg font-bold">₹<%= finalprice %>
                         </p>
-                        <button class="paybtn bg-green-700 text-white px-4 py-2 rounded">Place Order</button>
+                        <button class="paybtn bg-green-700 text-white px-4 py-2 rounded" style="<%= finalprice > 0 ? '' : 'display:none' %>">Place Order</button>
                     </div>
                 </div>
             </div>
@@ -190,11 +180,161 @@
             integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script>
+            function formatINR(num) {
+                return '₹' + num;
+            }
+
+            async function call(endpoint) {
+                return fetch(endpoint, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            }
+
+            function recomputeTotals() {
+                let subtotal = 0;
+                document.querySelectorAll('.item-total').forEach(function (el) {
+                    const id = el.getAttribute('data-id');
+                    const unit = Number(el.getAttribute('data-price')) || 0;
+                    const qtyEl = document.querySelector(`.quantity[data-id="${id}"]`);
+                    const qty = qtyEl ? (parseInt(qtyEl.textContent) || 0) : 0;
+                    subtotal += unit * qty;
+                });
+                const itemsTotalEl = document.getElementById('items-total');
+                const grandTotalEl = document.getElementById('grand-total');
+                const footerTotalEl = document.getElementById('footer-total');
+                const payBtn = document.querySelector('.paybtn');
+                // Only add delivery and handling charges (₹34) if there are items in cart
+                const finalTotal = subtotal > 0 ? subtotal + 34 : 0;
+                if (itemsTotalEl) itemsTotalEl.textContent = formatINR(subtotal);
+                if (grandTotalEl) grandTotalEl.textContent = formatINR(finalTotal);
+                if (footerTotalEl) footerTotalEl.textContent = formatINR(finalTotal);
+                if (payBtn) payBtn.style.display = finalTotal > 0 ? '' : 'none';
+            }
+
+            document.addEventListener('click', async function (e) {
+                const inc = e.target.closest('.cart-increment');
+                const dec = e.target.closest('.cart-decrement');
+                const btn = inc || dec;
+                if (!btn) return;
+                e.preventDefault();
+
+                const id = btn.getAttribute('data-id');
+                const quantityEl = document.querySelector(`.quantity[data-id="${id}"]`);
+                const row = btn.closest('.flex.items-center.mt-4');
+
+                try {
+                    if (inc) await call(`/cart/add/${id}`);
+                    else await call(`/cart/remove/${id}`);
+
+                    let qty = parseInt(quantityEl.textContent) || 0;
+                    qty = inc ? qty + 1 : Math.max(0, qty - 1);
+                    quantityEl.textContent = qty;
+
+                    // Update item totals if present
+                    const priceEl = row.querySelector('.item-total');
+                    const strikeEl = row.querySelector('.item-strike');
+                    if (priceEl) {
+                        const unit = Number(priceEl.getAttribute('data-price')) || 0;
+                        priceEl.textContent = formatINR(unit * qty);
+                    }
+                    if (strikeEl) {
+                        const unit = Number(strikeEl.getAttribute('data-price')) || 0;
+                        strikeEl.textContent = formatINR(unit * qty + 20);
+                    }
+
+                    // Remove row if qty is 0
+                    if (qty === 0 && row) row.remove();
+
+                    // Recompute totals after any change
+                    recomputeTotals();
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+
+            // Sync totals on initial load to avoid any server-render mismatch
+            document.addEventListener('DOMContentLoaded', function () {
+                recomputeTotals();
+            });
+
+            // Handle suggested product add buttons without full page reload
+            document.addEventListener('click', async function (e) {
+                const btn = e.target.closest('.add-suggested-product');
+                if (!btn) return;
+                e.preventDefault();
+
+                const id = btn.getAttribute('data-id');
+                // Try to find an existing cart row for this product
+                const existingQtyEl = document.querySelector(`.quantity[data-id="${id}"]`);
+                const itemsContainer = document.getElementById('cart-items');
+
+                // Pull minimal data from the suggested product card
+                const card = btn.closest('.flex.flex-col.items-center');
+                const imgSrc = card ? card.querySelector('img')?.getAttribute('src') || '' : '';
+                const nameText = card ? (card.querySelector('p.text-sm.text-center.mt-2')?.textContent || '') : '';
+                const priceText = card ? (card.querySelector('p.text-xs.mt-2')?.textContent || '').replace(/[^0-9]/g, '') : '0';
+                const unitPrice = Number(priceText) || 0;
+
+                // Optimistic UI: disable button while processing
+                btn.disabled = true;
+                try {
+                    await call(`/cart/add/${id}`);
+
+                    if (existingQtyEl) {
+                        // If already present in cart, just bump qty and recompute totals
+                        let qty = parseInt(existingQtyEl.textContent) || 0;
+                        qty += 1;
+                        existingQtyEl.textContent = qty;
+
+                        const row = existingQtyEl.closest('.flex.items-center.mt-4');
+                        const priceEl = row?.querySelector('.item-total');
+                        const strikeEl = row?.querySelector('.item-strike');
+                        if (priceEl) {
+                            const unit = Number(priceEl.getAttribute('data-price')) || unitPrice;
+                            priceEl.textContent = formatINR(unit * qty);
+                        }
+                        if (strikeEl) {
+                            const unit = Number(strikeEl.getAttribute('data-price')) || unitPrice;
+                            strikeEl.textContent = formatINR(unit * qty + 20);
+                        }
+                    } else if (itemsContainer && unitPrice > 0) {
+                        // Create a new cart row if it doesn't exist yet
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'flex items-center mt-4';
+                        wrapper.innerHTML = `
+                            <img src="${imgSrc}" alt="${nameText}" class="w-16 h-16 rounded">
+                            <div class="ml-4">
+                                <p>${nameText}</p>
+                                <p class="text-xs text-gray-500">170 g</p>
+                            </div>
+                            <div class="ml-auto">
+                                <div class="flex items-center justify-center bg-green-700 text-white rounded-md">
+                                    <button class="cart-decrement px-2 py-1 rounded" data-id="${id}"><i class="ri-subtract-line"></i></button>
+                                    <p class="mx-2 quantity" data-id="${id}">1</p>
+                                    <button class="cart-increment px-2 py-1 rounded" data-id="${id}"><i class="ri-add-line"></i></button>
+                                </div>
+                                <div class="flex gap-2 mt-4">
+                                    <p class="text-gray-500 line-through item-strike" data-id="${id}" data-price="${unitPrice}">${formatINR(unitPrice + 20)}</p>
+                                    <p class="item-total" data-id="${id}" data-price="${unitPrice}">${formatINR(unitPrice)}</p>
+                                </div>
+                            </div>
+                        `;
+                        itemsContainer.appendChild(wrapper);
+                    }
+
+                    // Recompute totals after any change
+                    recomputeTotals();
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        </script>
+        <script>
             document.querySelector('.paybtn').onclick = function (e) {
                 axios.post('/payment/create/orderId')
                     .then(function (response) {
                         var options = {
-                            "key": "rzp_test_cAa3gCF0eP8i4R", // Enter the Key ID generated from the Dashboard
+                            "key": "rzp_test_RbOOoQF3OBQp6a", // Enter the Key ID generated from the Dashboard
                             "amount": response.data.amount, // Amount in currency subunits. Default currency is INR.
                             "currency": response.data.currency,
                             "name": "BlinkIt",
@@ -216,8 +356,8 @@
                                     });
                             },
                             "prefill": {
-                                "name": "Harsh Sharma",
-                                "email": "harsh.sharma@example.com",
+                                "name": "Aniket Agnihotri",
+                                "email": "aniket@example.com",
                                 "contact": "9000090000"
                             },
                             "notes": {

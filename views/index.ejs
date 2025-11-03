@@ -38,8 +38,9 @@
                             </p>
                             <p class="font-bold">₹<%= elem.price %>
                             </p>
-                            <button class="bg-green-700 text-white px-4 py-1 rounded mt-2">ADD</button>
+                            <button class="add-to-cart bg-green-700 text-white px-4 py-1 rounded mt-2" data-id="<%= elem._id %>">ADD</button>
                         </div>
+                        
                         <%}) %>
                 </div>
             </div>
@@ -89,35 +90,34 @@
                                 <p class="text-sm text-center mt-2">
                                     <%= elem.name %>
                                 </p>
-                                <a class="px-4 text-white text-xs rounded mt-2 inline-block py-1 bg-green-700"
-                                    href="/cart/add/<%= elem._id %>">ADD</a>
+                        <p class="text-xs text-gray-500 line-through">₹<%= Number(elem.price)+20 %></p>
+                        <p class="font-bold">₹<%= elem.price %></p>
+                                <button class="add-to-cart px-4 text-white text-xs rounded mt-2 inline-block py-1 bg-green-700" data-id="<%= elem._id %>">ADD</button>
                             </div>
                             <%}) %>
                     </div>
                 </div>
                 <% } %>
 
-                    <% if(somethingInCart){ %>
-                        <div class="py-20"></div>
-                        <!-- Footer -->
-                        <div class="bg-white p-4 rounded-lg shadow fixed bottom-0 inset-x-0">
-                            <div class="flex justify-between items-center mb-10">
-                                <div>
-                                    <p class="text-sm">Get FREE delivery</p>
-                                    <p class="text-xs text-gray-500">Add products worth ₹236 more</p>
-                                </div>
-                                <button class="text-blue-500">See all coupons</button>
+                    <div class="py-20"></div>
+                    <!-- Footer (hidden when cart is empty) -->
+                    <div id="cart-footer" class="bg-white p-4 rounded-lg shadow fixed bottom-0 inset-x-0" style="<%= somethingInCart ? '' : 'display:none' %>">
+                        <div class="flex justify-between items-center mb-10">
+                            <div>
+                                <p class="text-sm">Get FREE delivery</p>
+                                <p class="text-xs text-gray-500">Add products worth ₹236 more</p>
                             </div>
-                            <div class="flex justify-between items-center mt-2">
-                                <div>
-                                    <%= cartCount %> Item
-                                </div>
-                                <a href="/cart"
-                                    class="flex items-center justify-center px-32 py-3 bg-green-700 text-white rounded-lg"><span
-                                        class="text-lg">Next</span><i class="text-2xl ri-arrow-right-s-fill"></i></a>
-                            </div>
+                            <button class="text-blue-500">See all coupons</button>
                         </div>
-                        <% } %>
+                        <div class="flex justify-between items-center mt-2">
+                            <div>
+                                <span data-cart-count><%= somethingInCart ? cartCount : 0 %></span> Item
+                            </div>
+                            <a href="/cart"
+                                class="flex items-center justify-center px-32 py-3 bg-green-700 text-white rounded-lg"><span
+                                    class="text-lg">Next</span><i class="text-2xl ri-arrow-right-s-fill"></i></a>
+                        </div>
+                    </div>
         </div>
 
         <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
@@ -152,6 +152,26 @@
                 const scrollPosition = localStorage.getItem('scrollPosition');
                 if (scrollPosition) {
                     window.scrollTo(0, scrollPosition);
+                }
+            });
+        </script>
+        <script>
+            document.addEventListener('click', async function (e) {
+                const btn = e.target.closest('.add-to-cart');
+                if (!btn) return;
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                try {
+                    await fetch(`/cart/add/${id}`, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    const footer = document.getElementById('cart-footer');
+                    if (footer && footer.style.display === 'none') footer.style.display = '';
+                    const counterEl = document.querySelector('[data-cart-count]');
+                    if (counterEl) {
+                        const current = parseInt(counterEl.textContent) || 0;
+                        counterEl.textContent = current + 1;
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
             });
         </script>
