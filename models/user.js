@@ -48,8 +48,11 @@ const userSchema = mongoose.Schema(
     },
     phone: {
       type: String,
+      required: true,
+      unique: true,
       match: /^[0-9]{10}$/,
       trim: true,
+      set: (v) => (typeof v === 'string' ? v.replace(/\D/g, '') : v),
     },
     addresses: {
       type: [AdressSchema],
@@ -58,11 +61,8 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-// Ensure phone numbers are unique only when present
-userSchema.index(
-  { phone: 1 },
-  { unique: true, partialFilterExpression: { phone: { $type: 'string' } } }
-);
+// Ensure unique index at DB level as well
+userSchema.index({ phone: 1 }, { unique: true });
 
 const validateUser = (data) => {
   const schema = Joi.object({
