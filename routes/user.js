@@ -4,7 +4,7 @@ const { userModel, validateUser } = require("../models/user");
 const mongoose = require("mongoose");
 
 router.get("/login", (req, res) => {
-  res.render("user_login");
+  res.render("user_login", { needPhone: req.query.needPhone === '1' });
 });
 
 router.get("/profile", (req, res) => {
