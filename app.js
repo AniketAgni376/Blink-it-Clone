@@ -58,13 +58,4 @@ app.use("/order", orderRouter);
 
 
 
-// Lightweight health endpoint for platform checks
-app.get('/health', (_req, res) => {
-  res.status(200).send('OK');
-});
-
-const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
-app.listen(PORT, HOST, () => {
-  console.log(`Server listening on http://${HOST}:${PORT}`);
-});
+app.listen(3000);

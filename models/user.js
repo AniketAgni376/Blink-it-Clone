@@ -47,12 +47,8 @@ const userSchema = mongoose.Schema(
       minlength: 6,
     },
     phone: {
-      type: String,
-      required: true,
-      unique: true,
+      type: Number,
       match: /^[0-9]{10}$/,
-      trim: true,
-      set: (v) => (typeof v === 'string' ? v.replace(/\D/g, '') : v),
     },
     addresses: {
       type: [AdressSchema],

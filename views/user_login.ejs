@@ -6,25 +6,12 @@
             <!-- Full-screen Image -->
             <img src="/images/blinkit.jpg" alt="Background Image" class="object-cover w-full h-full">
 
-            <!-- Bottom area: Google and optional signup -->
-            <div class="absolute bottom-0 w-full flex flex-col items-center gap-4 mb-8">
+            <!-- Button at the Bottom -->
+            <div class="absolute bottom-0 w-full flex justify-center mb-8">
                 <a href="/auth/google"
                     class="bg-black text-white font-semibold py-3 px-6 rounded-lg hover:bg-black transition duration-300">
                     Continue with Google
                 </a>
-
-                <% if (typeof needPhone !== 'undefined' && needPhone) { %>
-                <div class="bg-white/90 rounded-lg p-4 w-11/12 max-w-md">
-                    <p class="text-sm text-red-600 mb-2">We couldn't sign you in with Google because your account requires a phone number. Please sign up.</p>
-                    <form method="post" action="/users/signup" class="flex flex-col gap-2">
-                        <input name="name" required placeholder="Full name" class="border rounded p-2" />
-                        <input name="email" type="email" required placeholder="Email" class="border rounded p-2" />
-                        <input name="phone" required placeholder="10-digit phone" pattern="^[0-9]{10}$" class="border rounded p-2" />
-                        <input name="password" type="password" required minlength="6" placeholder="Password" class="border rounded p-2" />
-                        <button type="submit" class="bg-green-600 text-white py-2 rounded hover:bg-green-700">Create account</button>
-                    </form>
-                </div>
-                <% } %>
             </div>
         </div>
 

@@ -7,23 +7,23 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL:
-        process.env.GOOGLE_CALLBACK_URL ||
-        `${process.env.APP_BASE_URL || "http://localhost:3000"}/auth/google/callback`,
+      callbackURL: "http://localhost:3000/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, cb) {
       try {
-        const email = profile.emails && profile.emails[0] && profile.emails[0].value;
-        if (!email) return cb(null, false);
+        let user = await userModel.findOne({ email: profile.emails[0].value });
 
-        let user = await userModel.findOne({ email });
         if (!user) {
-          // Do not create users without a phone; force signup flow to collect phone
-          return cb(null, false);
+          user = new userModel({
+            name: profile.displayName,
+            email: profile.emails[0].value,
+          });
+
+          await user.save();
         }
-        return cb(null, user);
+        cb(null, user);
       } catch (err) {
-        return cb(err, false);
+        cb(err, false);
       }
     }
   )
