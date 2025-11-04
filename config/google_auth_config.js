@@ -13,19 +13,17 @@ passport.use(
     },
     async function (accessToken, refreshToken, profile, cb) {
       try {
-        let user = await userModel.findOne({ email: profile.emails[0].value });
+        const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+        if (!email) return cb(null, false);
 
+        let user = await userModel.findOne({ email });
         if (!user) {
-          user = new userModel({
-            name: profile.displayName,
-            email: profile.emails[0].value,
-          });
-
-          await user.save();
+          // Do not create users without a phone; force signup flow to collect phone
+          return cb(null, false);
         }
-        cb(null, user);
+        return cb(null, user);
       } catch (err) {
-        cb(err, false);
+        return cb(err, false);
       }
     }
   )

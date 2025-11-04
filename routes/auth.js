@@ -15,9 +15,8 @@ router.get('/google',
 router.get('/google/callback', 
   passport.authenticate('google', { 
     successRedirect: '/products',
-    failureRedirect: '/', 
+    failureRedirect: '/users/login?needPhone=1', 
   }),
-  
 );
 
 router.get('/logout', function(req, res, next){
