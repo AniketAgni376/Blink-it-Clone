@@ -47,14 +47,21 @@ const userSchema = mongoose.Schema(
       minlength: 6,
     },
     phone: {
-      type: Number,
-      match: /^[0-9]{10}$/, // Assuming 10-digit phone numbers
+      type: String,
+      match: /^[0-9]{10}$/,
+      trim: true,
     },
     addresses: {
       type: [AdressSchema],
     },
   },
   { timestamps: true }
+);
+
+// Ensure phone numbers are unique only when present
+userSchema.index(
+  { phone: 1 },
+  { unique: true, partialFilterExpression: { phone: { $type: 'string' } } }
 );
 
 const validateUser = (data) => {
