@@ -61,8 +61,6 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-// Ensure unique index at DB level as well
-userSchema.index({ phone: 1 }, { unique: true });
 
 const validateUser = (data) => {
   const schema = Joi.object({
