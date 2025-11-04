@@ -7,8 +7,17 @@ if (!uri) {
   process.exit(1);
 }
 
-mongoose.connect(uri)
+mongoose
+  .connect(uri, {
+    serverSelectionTimeoutMS: 8000,
+    maxPoolSize: 10,
+  })
   .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection failed:", err.message));
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:", err.message);
+    console.error("🔎 MONGOURL host:", (() => {
+      try { return new URL(uri.replace('mongodb+srv', 'http').replace('mongodb', 'http')).host; } catch { return 'unknown'; }
+    })());
+  });
 
 module.exports = mongoose;
