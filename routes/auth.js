@@ -12,12 +12,25 @@ router.get('/google',
     
 );
 
-router.get('/google/callback', 
-  passport.authenticate('google', { 
-    successRedirect: '/products',
-    failureRedirect: '/', 
-  }),
-);
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', (err, user, info) => {
+    if (err) {
+      console.error('❌ Google OAuth callback error:', err);
+      return res.redirect('/?oauth_error=token');
+    }
+    if (!user) {
+      console.error('❌ Google OAuth failed, no user returned. Info:', info);
+      return res.redirect('/?oauth_error=denied');
+    }
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        console.error('❌ Google OAuth login error:', loginErr);
+        return res.redirect('/?oauth_error=login');
+      }
+      return res.redirect('/products');
+    });
+  })(req, res, next);
+});
 
 router.get('/logout', function(req, res, next){
   req.logout(function (err) {

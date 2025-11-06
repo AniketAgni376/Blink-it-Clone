@@ -2,12 +2,25 @@ var GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { userModel } = require("../models/user");
 const passport = require("passport");
 
+const {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_CALLBACK_URL,
+} = process.env;
+
+if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+  console.error(
+    "❌ Google OAuth env vars missing: ensure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set"
+  );
+}
+
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/callback",
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL:
+        GOOGLE_CALLBACK_URL || "http://localhost:3000/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, cb) {
       try {

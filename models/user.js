@@ -57,6 +57,12 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+// Ensure phone is unique only when provided (exclude null/absent values)
+userSchema.index(
+  { phone: 1 },
+  { unique: true, partialFilterExpression: { phone: { $exists: true, $ne: null } } }
+);
+
 
 const validateUser = (data) => {
   const schema = Joi.object({
