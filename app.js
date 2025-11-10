@@ -24,7 +24,7 @@ require('./config/google_auth_config');
 
 if (
   typeof process.env.NODE_ENV !== "undefined" && 
-  process.env.NODE_ENV === "DEVELOPMENT") {
+  process.env.NODE_ENV === "development") {
     console.log("in Development mode");
   }
 
@@ -41,7 +41,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || "secretKey",
   resave: false,
   saveUninitialized: true,
-  cookie: process.env.NODE_ENV === 'PRODUCTION' ? { secure: true, sameSite: 'lax' } : {}
+  cookie: process.env.NODE_ENV === 'production' ? { secure: true, sameSite: 'lax' } : {}
 }));
 
 app.use(cookieParser());
