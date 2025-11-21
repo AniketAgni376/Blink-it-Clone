@@ -7,8 +7,7 @@ require('dotenv').config();
 const CLIENT_URL =
   process.env.CLIENT_URL ||
   (process.env.NODE_ENV === "production"
-    ? "https://blink-it-cloneeeee.onrender.com"
-    : "http://localhost:3000");
+    && "http://localhost:3000");
 
 // Step 1: Start Google OAuth flow
 router.get(

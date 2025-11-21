@@ -11,7 +11,14 @@
     "type": "git",
     "url": "git+https://github.com/AniketAgni376/Blink-it-Clone.git"
   },
-  "keywords": ["blinkit", "nodejs", "express", "ejs", "mongodb", "clone"],
+  "keywords": [
+    "blinkit",
+    "nodejs",
+    "express",
+    "ejs",
+    "mongodb",
+    "clone"
+  ],
   "author": "Aniket Agnihotri",
   "license": "ISC",
   "type": "commonjs",
